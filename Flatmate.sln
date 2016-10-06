@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5410A7BF-85A8-4D65-9E18-74BBA1478DE2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8BCF10E-9B39-4D1F-82EF-FD87BFC21CEA}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Flatmate.Web", "src\Flatmate.Web\Flatmate.Web.xproj", "{ED673ADA-01F9-4214-9F06-E610AFBC3368}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Flatmate.Domain", "src\Flatmate.Domain\Flatmate.Domain.xproj", "{A84FD995-C152-4678-9B1A-8BB7D474C334}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E5EC69F7-DBD6-4359-B732-FB572A104448}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Flatmate.Domain.Tests", "test\Flatmate.Domain.Tests\Flatmate.Domain.Tests.xproj", "{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED673ADA-01F9-4214-9F06-E610AFBC3368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED673ADA-01F9-4214-9F06-E610AFBC3368}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED673ADA-01F9-4214-9F06-E610AFBC3368}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED673ADA-01F9-4214-9F06-E610AFBC3368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A84FD995-C152-4678-9B1A-8BB7D474C334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A84FD995-C152-4678-9B1A-8BB7D474C334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A84FD995-C152-4678-9B1A-8BB7D474C334}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A84FD995-C152-4678-9B1A-8BB7D474C334}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ED673ADA-01F9-4214-9F06-E610AFBC3368} = {5410A7BF-85A8-4D65-9E18-74BBA1478DE2}
+		{A84FD995-C152-4678-9B1A-8BB7D474C334} = {5410A7BF-85A8-4D65-9E18-74BBA1478DE2}
+		{5C77B84B-DBC3-414D-8A39-9D24DE5FAE1E} = {E5EC69F7-DBD6-4359-B732-FB572A104448}
+	EndGlobalSection
+EndGlobal
