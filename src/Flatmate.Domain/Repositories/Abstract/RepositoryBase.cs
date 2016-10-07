@@ -28,5 +28,38 @@ namespace Flatmate.Domain.Repositories.Abstract
         {
             return _collection.Find(expresion).ToList();
         }
+
+        public T FindById(string id)
+        {
+            return _collection.Find(x => x.Id == id).FirstOrDefault();
+        }
+
+        public void Insert(T item)
+        {
+            _collection.InsertOne(item);
+        }
+
+        public void Update(T item)
+        {
+            BsonDocument doc = item.ToBsonDocument();
+            _collection.UpdateOne(x => x.Id == item.Id, doc);
+        }
+
+        public long Update(Expression<Func<T, bool>> filter, Update<T> updateDefinition)
+        {
+            if (updateDefinition == null)
+                throw new ArgumentNullException("updateDefinition");
+
+            var firstDef = updateDefinition.FieldsWithValues.First();
+
+            var mongoUpdDef = Builders<T>.Update.Set(firstDef.Key, firstDef.Value);    
+
+            foreach (var item in updateDefinition.FieldsWithValues)
+            {
+                mongoUpdDef = mongoUpdDef.Set(item.Key, item.Value);
+            }
+
+            return _collection.UpdateMany(filter, mongoUpdDef).MatchedCount;
+        }
     }
 }

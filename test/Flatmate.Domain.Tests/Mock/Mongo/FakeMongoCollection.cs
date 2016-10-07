@@ -12,6 +12,13 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
     public class FakeMongoCollection<T> : IMongoCollection<T>
         where T: class, new()
     {
+        private readonly List<T> _items;
+
+        public FakeMongoCollection()
+        {
+            _items = new List<T>();
+        }
+
         public CollectionNamespace CollectionNamespace
         {
             get
@@ -149,7 +156,11 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public IAsyncCursor<TProjection> FindSync<TProjection>(FilterDefinition<T> filter, FindOptions<T, TProjection> options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return new FakeAsyncCursor<TProjection>();
+            var filterExpresion = filter as ExpressionFilterDefinition<T>;
+            if (filterExpresion == null)
+                return new FakeAsyncCursor<T>(_items) as IAsyncCursor<TProjection>;
+
+            return new FakeAsyncCursor<T>(_items.Where(filterExpresion.Expression.Compile())) as IAsyncCursor<TProjection>;
         }
 
         public void InsertMany(IEnumerable<T> documents, InsertManyOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
@@ -164,7 +175,8 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public void InsertOne(T document, InsertOneOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            BsonDocument doc = document.ToBsonDocument();
+            _items.Add(BsonSerializer.Deserialize<T>(doc));
         }
 
         public Task InsertOneAsync(T document, CancellationToken _cancellationToken)
@@ -204,7 +216,14 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public UpdateResult UpdateMany(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var filterExpresion = filter as ExpressionFilterDefinition<T>;
+            if (filterExpresion != null)
+            {
+                var findResult = _items.Where(filterExpresion.Expression.Compile());
+                return new UpdateResult.Acknowledged(findResult.Count(), null, null);
+            }
+
+            return new UpdateResult.Acknowledged(0, null, null);
         }
 
         public Task<UpdateResult> UpdateManyAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
@@ -214,7 +233,30 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public UpdateResult UpdateOne(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var filterExpresion = filter as ExpressionFilterDefinition<T>;
+            var updateDocument = update as BsonDocumentUpdateDefinition<T>;
+
+            if (filterExpresion != null && updateDocument != null)
+            {
+                var item = _items.SingleOrDefault(filterExpresion.Expression.Compile());
+                if (item != null)
+                {
+                    int index = _items.IndexOf(item);
+
+                    BsonDocument doc = item.ToBsonDocument();
+
+                    foreach (var element in updateDocument.Document.Elements)
+                    {
+                        doc.Set(element.Name, element.Value);
+                    }
+
+                    _items[index] = BsonSerializer.Deserialize<T>(doc);
+
+                    return new UpdateResult.Acknowledged(1, 1, null);
+                }
+            }
+
+            return new UpdateResult.Acknowledged(0, null, null);
         }
 
         public Task<UpdateResult> UpdateOneAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, UpdateOptions options = null, CancellationToken cancellationToken = default(CancellationToken))

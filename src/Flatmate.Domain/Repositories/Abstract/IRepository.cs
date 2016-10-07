@@ -12,5 +12,9 @@ namespace Flatmate.Domain.Repositories.Abstract
     {
         IEnumerable<T> Find();
         IEnumerable<T> Find(Expression<Func<T, bool>> expresion);
+        T FindById(string id);
+        void Insert(T item);
+        void Update(T item);
+        long Update(Expression<Func<T, bool>> filter, Update<T> updateDefinition);
     }
 }

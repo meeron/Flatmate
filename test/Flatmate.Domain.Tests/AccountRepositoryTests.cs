@@ -10,6 +10,7 @@ using Xunit;
 using System.Collections;
 using System.Linq.Expressions;
 using Flatmate.Domain.Tests.Mock;
+using Flatmate.Domain;
 
 namespace Tests
 {
@@ -27,6 +28,64 @@ namespace Tests
         {
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
             Assert.Equal(0, accountRepository.Find(x => x.Name == "test").Count());
+        }
+
+        [Fact]
+        public void Find_By_Id()
+        {
+            string id = Guid.NewGuid().ToString();
+
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+            accountRepository.Insert(new Account { Id = id });
+
+            Assert.NotNull(accountRepository.FindById(id));
+        }
+
+        [Fact]
+        public void Insert()
+        {
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+
+            var account = new Account { Email = "test" };
+            accountRepository.Insert(account);
+
+            Assert.NotNull(accountRepository.Find(x => x.Email == "test").SingleOrDefault());
+        }
+
+        [Fact]
+        public void Update_By_Object()
+        {
+            string newEmail = "new_test_email";
+
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+            var account = new Account { Id = Guid.NewGuid().ToString(), Email = "test" };
+            accountRepository.Insert(account);
+
+            account.Email = newEmail;
+
+            accountRepository.Update(account);
+
+            var updAccount = accountRepository.FindById(account.Id);
+
+            Assert.Equal(newEmail, updAccount.Email);
+        }
+
+        [Fact]
+        public void Update_By_Fields()
+        {
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+
+            accountRepository.Insert(new Account { Email = "test", Password = "pass1" });
+            accountRepository.Insert(new Account { Email = "test", Password = "pass2" });
+
+            long countAll = accountRepository.Find().Count();
+
+            var updateDef = Update<Account>.Set("Password", "pass3")
+                                .And("Name", "name_test");
+
+            long countUpd = accountRepository.Update(x => x.Email == "test", updateDef);
+
+            Assert.Equal(countAll, countUpd);
         }
     }
 }
