@@ -83,9 +83,21 @@ namespace Tests
             var updateDef = Update<Account>.Set("Password", "pass3")
                                 .And("Name", "name_test");
 
-            long countUpd = accountRepository.Update(x => x.Email == "test", updateDef);
+            long countUpd = accountRepository.UpdateWhere(x => x.Email == "test", updateDef);
 
             Assert.Equal(countAll, countUpd);
+        }
+
+        [Fact]
+        public void Delete_Where()
+        {
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+
+            accountRepository.Insert(new Account { Email = "test", Password = "pass1" });
+            accountRepository.Insert(new Account { Email = "test", Password = "pass2" });
+
+            long deleteCount = accountRepository.DeleteWhere(x => x.Email == "test");
+            Assert.Equal(2, deleteCount);
         }
     }
 }

@@ -91,7 +91,20 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public DeleteResult DeleteMany(FilterDefinition<T> filter, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var filterExpresion = filter as ExpressionFilterDefinition<T>;
+            if (filterExpresion == null)
+                throw new NotSupportedException();
+
+            var itemsToDelete = _items.Where(filterExpresion.Expression.Compile()).ToArray();
+            long count = 0;
+
+            for (int i = 0; i < itemsToDelete.Length; i++)
+            {
+                if (_items.Remove(itemsToDelete[i]))
+                    count++;
+            }
+
+            return new DeleteResult.Acknowledged(count);
         }
 
         public Task<DeleteResult> DeleteManyAsync(FilterDefinition<T> filter, CancellationToken cancellationToken = default(CancellationToken))

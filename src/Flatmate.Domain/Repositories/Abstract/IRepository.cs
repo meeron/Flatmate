@@ -15,6 +15,7 @@ namespace Flatmate.Domain.Repositories.Abstract
         T FindById(string id);
         void Insert(T item);
         void Update(T item);
-        long Update(Expression<Func<T, bool>> filter, Update<T> updateDefinition);
+        long UpdateWhere(Expression<Func<T, bool>> filter, Update<T> updateDefinition);
+        long DeleteWhere(Expression<Func<T, bool>> filter);
     }
 }

@@ -45,7 +45,7 @@ namespace Flatmate.Domain.Repositories.Abstract
             _collection.UpdateOne(x => x.Id == item.Id, doc);
         }
 
-        public long Update(Expression<Func<T, bool>> filter, Update<T> updateDefinition)
+        public long UpdateWhere(Expression<Func<T, bool>> filter, Update<T> updateDefinition)
         {
             if (updateDefinition == null)
                 throw new ArgumentNullException("updateDefinition");
@@ -60,6 +60,11 @@ namespace Flatmate.Domain.Repositories.Abstract
             }
 
             return _collection.UpdateMany(filter, mongoUpdDef).MatchedCount;
+        }
+
+        public long DeleteWhere(Expression<Func<T, bool>> filter)
+        {
+            return _collection.DeleteMany(filter).DeletedCount;
         }
     }
 }
