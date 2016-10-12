@@ -1,4 +1,5 @@
-﻿using Flatmate.Domain.Models.Abstract;
+﻿using Flatmate.Domain.Enums;
+using Flatmate.Domain.Models.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,23 @@ namespace Flatmate.Domain.Models
 {
     public class Account: ModelBase
     {
+        #region Constructors
+        public Account()
+        {
+            FacebookIds = new HashSet<Facebook>();
+        }
+        #endregion
+
+        #region Properties
         public string Email { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
+        public string PhoneNumber { get; set; }
 
+        public ICollection<Facebook> FacebookIds { get; set; }
+        #endregion
+
+        #region Methods
         public bool ValidatePassword(string password)
         {
             using (var sha = SHA256.Create())
@@ -30,5 +44,14 @@ namespace Flatmate.Domain.Models
                 Password = Convert.ToBase64String(sha.ComputeHash(Encoding.UTF8.GetBytes(password)));
             }
         }
+        #endregion
+
+        #region Classes
+        public class Facebook
+        {
+            public string AppId { get; set; }
+            public int UserId { get; set; }
+        }
+        #endregion
     }
 }

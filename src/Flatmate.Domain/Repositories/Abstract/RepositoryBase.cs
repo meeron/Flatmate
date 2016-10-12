@@ -36,6 +36,9 @@ namespace Flatmate.Domain.Repositories.Abstract
 
         public void Insert(T item)
         {
+            if (string.IsNullOrWhiteSpace(item.Id))
+                item.Id = ModelId.NewId().ToString();
+
             _collection.InsertOne(item);
         }
 
