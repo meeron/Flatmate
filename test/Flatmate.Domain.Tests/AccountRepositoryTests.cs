@@ -33,7 +33,7 @@ namespace Tests
         [Fact]
         public void Find_By_Id()
         {
-            string id = ModelId.NewId().ToString();
+            var id = ModelId.NewId();
 
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
             accountRepository.Insert(new Account { Id = id });
@@ -58,7 +58,7 @@ namespace Tests
             string newEmail = "new_test_email";
 
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
-            var account = new Account { Id = ModelId.NewId().ToString(), Email = "test" };
+            var account = new Account { Id = ModelId.NewId(), Email = "test" };
             accountRepository.Insert(account);
 
             account.Email = newEmail;

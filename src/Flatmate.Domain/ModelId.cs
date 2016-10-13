@@ -49,11 +49,11 @@ namespace Flatmate.Domain
             if (string.IsNullOrWhiteSpace(s))
                 throw new ArgumentNullException("s");
 
-            if (s.Length != BASE64_LEN)
-                throw new FormatException("Invalid string length.");
+            ModelId idOut = ModelId.Empty;
+            if (!TryParse(s, out idOut))
+                throw new FormatException(string.Format("Text '{0}' is invalid for ModelId type.", s));
 
-            s = s.Replace('-', '/');
-            return new ModelId(Convert.FromBase64String(s));
+            return idOut;
         }
 
         public static bool TryParse(string s, out ModelId id)
@@ -89,12 +89,17 @@ namespace Flatmate.Domain
 
         public override string ToString()
         {
+            return Convert.ToBase64String(ToByteArray()).Replace('/','-');
+        }
+
+        public byte[] ToByteArray()
+        {
             byte[] value = BitConverter.GetBytes(_value);
             Array.Resize(ref value, SIZE);
             value[4] = _control1;
             value[5] = _control2;
 
-            return Convert.ToBase64String(value).Replace('/','-');
+            return value;
         }
 
         public override bool Equals(object obj)

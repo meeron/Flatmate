@@ -8,7 +8,7 @@ namespace Flatmate.Domain.Models.Abstract
 {
     public abstract class ModelBase
     {
-        [BsonId]
-        public string Id { get; set; }
+        [BsonId, BsonSerializer(typeof(ModelIdBsonSerializer))]
+        public ModelId Id { get; set; }
     }
 }

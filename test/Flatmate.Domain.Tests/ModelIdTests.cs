@@ -75,6 +75,13 @@ namespace Flatmate.Domain.Tests
         }
 
         [Fact]
+        public void Parse_Error()
+        {
+            Exception ex = Assert.Throws<FormatException>(() => ModelId.Parse("sdfsdfsdfsdfsdfsdfsdfsdfdf"));
+            Assert.Equal("Text 'sdfsdfsdfsdfsdfsdfsdfsdfdf' is invalid for ModelId type.", ex.Message);
+        }
+
+        [Fact]
         public void TryParse()
         {
             ModelId id = ModelId.NewId();
@@ -88,6 +95,14 @@ namespace Flatmate.Domain.Tests
             Assert.False(invalid);
             Assert.Equal(id, id2);
             Assert.Equal(ModelId.Empty, id3);
+        }
+
+        [Fact]
+        public void ToByteArray()
+        {
+            ModelId id = ModelId.NewId();
+
+            Assert.Equal(id, new ModelId(id.ToByteArray()));
         }
     }
 }

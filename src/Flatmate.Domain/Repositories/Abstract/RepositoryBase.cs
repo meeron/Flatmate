@@ -29,15 +29,15 @@ namespace Flatmate.Domain.Repositories.Abstract
             return _collection.Find(expresion).ToList();
         }
 
-        public T FindById(string id)
+        public T FindById(ModelId id)
         {
             return _collection.Find(x => x.Id == id).FirstOrDefault();
         }
 
         public void Insert(T item)
         {
-            if (string.IsNullOrWhiteSpace(item.Id))
-                item.Id = ModelId.NewId().ToString();
+            if (item.Id == ModelId.Empty)
+                item.Id = ModelId.NewId();
 
             _collection.InsertOne(item);
         }

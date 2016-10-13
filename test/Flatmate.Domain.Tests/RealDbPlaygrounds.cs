@@ -11,7 +11,7 @@ namespace Flatmate.Domain.Tests
 {
     public class RealDbPlaygrounds
     {
-        //[Fact]
+        [Fact]
         public void RealDb_Playground()
         {
             var client = new MongoClient("mongodb://localhost:27017");
@@ -26,7 +26,7 @@ namespace Flatmate.Domain.Tests
 
             var dbacc = accountRepository.FindById(acc.Id);
 
-            Assert.True(true);
+            Assert.NotNull(dbacc);
         }
     }
 }
