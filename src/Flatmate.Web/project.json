@@ -21,7 +21,8 @@
     "Microsoft.Extensions.Logging.Debug": "1.0.0",
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
-    "Flatmate.Domain": "1.0.0-*"
+    "Flatmate.Domain": "1.0.0-*",
+    "MongoDB.Driver": "2.3.0"
   },
 
   "tools": {

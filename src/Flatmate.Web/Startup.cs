@@ -8,6 +8,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Flatmate.Web.Core;
+using Flatmate.Web.Infrastructure;
+using Flatmate.Web.Infrastructure.Impl;
+using Flatmate.Domain.Repositories.Abstract;
+using Flatmate.Domain.Repositories;
+using MongoDB.Driver;
+using Flatmate.Domain;
 
 namespace Flatmate.Web
 {
@@ -19,7 +25,7 @@ namespace Flatmate.Web
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddEnvironmentVariables($"FLATMATE_{env.EnvironmentName}_");
             Configuration = builder.Build();
         }
 
@@ -28,6 +34,13 @@ namespace Flatmate.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services.Configure<AppConfig>(Configuration.GetSection("AppConfig"));
+            services.Configure<AppConfig>(config =>
+            {
+                config.AuthenticationKey = Configuration.GetValue<string>("AuthKey");
+            });
+
             // Add framework services.
             services.AddMvc(o => o.Conventions.Add(new FeatureConvention()))
                 .AddRazorOptions(options =>
@@ -42,6 +55,10 @@ namespace Flatmate.Web
                     options.ViewLocationFormats.Add("/Features/Shared/{0}.cshtml");
                     options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
                 });
+
+            services.AddSingleton(MongoDatabaseFactory.Create(Configuration.GetValue<string>("MongoDb")));
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IAuthenticateService, AuthenticateService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

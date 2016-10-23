@@ -79,10 +79,11 @@ namespace Tests
         {
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
 
-            var account = new Account { Email = "test" };
+            var account = new Account { Email = "admin@flatmate.com" };
+            account.SetPassword("qweqwe");
             accountRepository.Insert(account);
 
-            Assert.NotNull(accountRepository.Find(x => x.Email == "test").SingleOrDefault());
+            Assert.NotNull(accountRepository.Find(x => x.Email == account.Email).SingleOrDefault());
         }
 
         [Fact]

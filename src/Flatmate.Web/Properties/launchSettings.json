@@ -12,7 +12,9 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "FLATMATE_Development_MongoDb": "mongodb://localhost:27017/flatmate_dev",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FLATMATE_Development_AuthKey": "ANC86rK4e0Zekc11xcwtN1quvwgrrxX+wkxg8QJF768="
       }
     },
     "Flatmate.Web": {
