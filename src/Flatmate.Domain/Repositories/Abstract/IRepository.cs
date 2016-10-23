@@ -13,6 +13,8 @@ namespace Flatmate.Domain.Repositories.Abstract
         IEnumerable<T> Find();
         IEnumerable<T> Find(Expression<Func<T, bool>> expresion);
         T FindById(ModelId id);
+        long Count(Expression<Func<T, bool>> expresion);
+        long Count();
         void Insert(T item);
         void Update(T item);
         long UpdateWhere(Expression<Func<T, bool>> filter, Update<T> updateDefinition);

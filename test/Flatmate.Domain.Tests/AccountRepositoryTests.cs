@@ -27,7 +27,7 @@ namespace Tests
         public void Find_Expression()
         {
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
-            Assert.Equal(0, accountRepository.Find(x => x.Name == "test").Count());
+            Assert.Equal(0, accountRepository.Find(x => x.UserProfile.Name == "test").Count());
         }
 
         [Fact]
@@ -39,6 +39,28 @@ namespace Tests
             accountRepository.Insert(new Account { Id = id });
 
             Assert.NotNull(accountRepository.FindById(id));
+        }
+
+        [Fact]
+        public void Count_Expresson()
+        {
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+
+            accountRepository.Insert(new Account { Email = "test", Password = "pass1" });
+            accountRepository.Insert(new Account { Email = "test", Password = "pass2" });
+
+            Assert.Equal(2, accountRepository.Count(x => x.Email == "test"));
+        }
+
+        [Fact]
+        public void Count()
+        {
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+
+            accountRepository.Insert(new Account { Email = "test", Password = "pass1" });
+            accountRepository.Insert(new Account { Email = "test", Password = "pass2" });
+
+            Assert.Equal(2, accountRepository.Count());
         }
 
         [Fact]

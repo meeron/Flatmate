@@ -81,7 +81,11 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
         public long Count(FilterDefinition<T> filter, CountOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            var filterExpresion = filter as ExpressionFilterDefinition<T>;
+            if (filterExpresion == null)
+                return _items.LongCount();
+
+            return _items.LongCount(filterExpresion.Expression.Compile());
         }
 
         public Task<long> CountAsync(FilterDefinition<T> filter, CountOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
@@ -260,7 +264,16 @@ namespace Flatmate.Domain.Tests.Mock.Mongo
 
                     foreach (var element in updateDocument.Document.Elements)
                     {
-                        doc.Set(element.Name, element.Value);
+                        if (element.Name == "$set")
+                        {
+                            var updateDoc = element.Value.ToBsonDocument();
+                            foreach (var docElement in updateDoc.Elements)
+                            {
+                                doc.Set(docElement.Name, docElement.Value);
+                            }
+                        }
+                        else
+                            doc.Set(element.Name, element.Value);
                     }
 
                     _items[index] = BsonSerializer.Deserialize<T>(doc);

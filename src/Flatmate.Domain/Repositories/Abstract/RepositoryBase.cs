@@ -44,7 +44,8 @@ namespace Flatmate.Domain.Repositories.Abstract
 
         public void Update(T item)
         {
-            BsonDocument doc = item.ToBsonDocument();
+            BsonDocument doc = new BsonDocument { { "$set", item.ToBsonDocument() } };
+
             _collection.UpdateOne(x => x.Id == item.Id, doc);
         }
 
@@ -68,6 +69,16 @@ namespace Flatmate.Domain.Repositories.Abstract
         public long DeleteWhere(Expression<Func<T, bool>> filter)
         {
             return _collection.DeleteMany(filter).DeletedCount;
+        }
+
+        public long Count(Expression<Func<T, bool>> expresion)
+        {
+            return _collection.Count(expresion);
+        }
+
+        public long Count()
+        {
+            return _collection.Count(new BsonDocument());
         }
     }
 }
