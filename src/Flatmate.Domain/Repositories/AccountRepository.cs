@@ -13,6 +13,11 @@ namespace Flatmate.Domain.Repositories
         public AccountRepository(IMongoDatabase database)
             :base(database)
         {
-        } 
+        }
+
+        public Account FindByEmail(string email)
+        {
+            return _collection.Find(x => x.Email == email).SingleOrDefault();
+        }
     }
 }

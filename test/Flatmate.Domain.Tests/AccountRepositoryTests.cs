@@ -42,6 +42,17 @@ namespace Tests
         }
 
         [Fact]
+        public void Find_By_Email()
+        {
+            string email = "test@domain.com";
+
+            var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());
+            accountRepository.Insert(new Account { Email = email });
+
+            Assert.NotNull(accountRepository.FindByEmail(email));
+        }
+
+        [Fact]
         public void Count_Expresson()
         {
             var accountRepository = new AccountRepository(MockHelper.CreateDatabaseForCollection<Account>());

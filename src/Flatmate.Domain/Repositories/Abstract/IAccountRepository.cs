@@ -8,5 +8,6 @@ namespace Flatmate.Domain.Repositories.Abstract
 {
     public interface IAccountRepository: IRepository<Account>
     {
+        Account FindByEmail(string email);
     }
 }
