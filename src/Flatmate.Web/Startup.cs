@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Flatmate.Web.Core;
 
 namespace Flatmate.Web
 {
@@ -28,7 +29,19 @@ namespace Flatmate.Web
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(o => o.Conventions.Add(new FeatureConvention()))
+                .AddRazorOptions(options =>
+                {
+                    // {0} - Action Name
+                    // {1} - Controller Name
+                    // {3} - Feature Name
+                    // Replace normal view location entirely
+                    options.ViewLocationFormats.Clear();
+                    options.ViewLocationFormats.Add("/Features/{3}/{1}/{0}.cshtml");
+                    options.ViewLocationFormats.Add("/Features/{3}/{0}.cshtml");
+                    options.ViewLocationFormats.Add("/Features/Shared/{0}.cshtml");
+                    options.ViewLocationExpanders.Add(new FeatureViewLocationExpander());
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
