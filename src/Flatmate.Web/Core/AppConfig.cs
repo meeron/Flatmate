@@ -27,5 +27,10 @@ namespace Flatmate.Web.Core
             if (AuthenticationTimeout <= 0)
                 AuthenticationTimeout = DEF_TIMEOUT;
         }
+
+        public byte[] AuthenticationKeyBytes
+        {
+            get { return Convert.FromBase64String(AuthenticationKey); }
+        }
     }
 }

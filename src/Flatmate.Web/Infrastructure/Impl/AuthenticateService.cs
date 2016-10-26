@@ -10,13 +10,12 @@ using Flatmate.Web.Core.Security;
 using Newtonsoft.Json;
 using System.Text;
 using System.Security.Cryptography;
+using Flatmate.Domain.Models;
 
 namespace Flatmate.Web.Infrastructure.Impl
 {
     public class AuthenticateService : IAuthenticateService
     {
-        private static byte[] IV = new byte[] { 86, 225, 88, 115, 210, 104, 117, 49, 129, 228, 169, 119, 171, 89, 240, 23 };
-
         private readonly IAccountRepository _accountRepo;
         private readonly AppConfig _config;
 
@@ -28,34 +27,45 @@ namespace Flatmate.Web.Infrastructure.Impl
             _config.ThrowIfInvalid();
         }
 
+        public AuthenticatedUser AuthenticateUserByToken(AuthenticationToken token)
+        {
+            //TODO: log info why authentication failed.
+
+            if (token == null)
+                throw new ArgumentNullException("token");
+
+            if (token.Timestamp <= 0)
+                return null; //invalid token
+
+            if (DateTime.Now > token.Expires)
+                return null; //token expired
+
+            Account account = _accountRepo.FindByEmail(token.Email);
+            if (account == null)
+                throw new InvalidOperationException(string.Format("Cannot find account '{0}'.", token.Email)); //something is wrong when valid token contains invalid user
+
+            return AuthenticatedUser.FromAccount(account);
+        }
+
         public string GetToken(PostViewModel model)
         {
             if (model == null)
                 throw new ArgumentNullException("model");
 
-            var account = _accountRepo.FindByEmail(model.Email);
+            Account account = _accountRepo.FindByEmail(model.Email);
             if (account == null)
                 return string.Empty;
 
             if (account.ValidatePassword(model.Password))
             {
                 //if password match, create token
-                var tokenObject = new AuthenticationToken
-                {
-                    Email = model.Email,
-                    Expires = DateTime.Now.AddMinutes(_config.AuthenticationTimeout),
-                    Timestamp = DateTime.Now.Ticks
-                };
-                string tokenJson = JsonConvert.SerializeObject(tokenObject);
-                byte[] tokenBytes = Encoding.UTF8.GetBytes(tokenJson);
+                var tokenObject = new AuthenticationToken(_config.AuthenticationKeyBytes);
 
-                using (var aes = Aes.Create())
-                {
-                    aes.IV = IV;
-                    aes.Key = Convert.FromBase64String(_config.AuthenticationKey);
+                tokenObject.Email = model.Email;
+                tokenObject.Expires = DateTime.Now.AddMinutes(_config.AuthenticationTimeout);
+                tokenObject.Timestamp = DateTime.Now.Ticks;
 
-                    return Convert.ToBase64String(aes.CreateEncryptor().TransformFinalBlock(tokenBytes, 0, tokenBytes.Length));
-                }
+                return tokenObject.Encrypt();
             }
 
             return string.Empty;
