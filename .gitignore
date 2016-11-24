@@ -237,3 +237,5 @@ _Pvt_Extensions
 
 # wwwRoot Angualr 2 libs
 src/ASP.NET-Core-SPAs/wwwroot/Angular/lib/
+
+.vscode
