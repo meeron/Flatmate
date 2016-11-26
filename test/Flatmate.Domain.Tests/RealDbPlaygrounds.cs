@@ -16,11 +16,10 @@ namespace Flatmate.Domain.Tests
         {
             var client = new MongoClient("mongodb://localhost:27017");
 
-            var accountRepository = new AccountRepository(client.GetDatabase("flatmate_playground"));
-            accountRepository.Insert(new Account { Email = "test", Password = "pass1" });
+            var accountRepository = new AccountRepository(client.GetDatabase("Flatmate"));
 
-            var acc = new Account();
-            acc.FacebookIds.Add(new Account.Facebook { AppId = "Test", UserId = 12312321 });
+            var acc = new Account { Email = "admin@flatmate.io" };        
+            acc.SetPassword("xxx");
 
             accountRepository.Insert(acc);
 

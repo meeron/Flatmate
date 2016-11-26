@@ -31,7 +31,7 @@ namespace Flatmate.Web.Features.Api
         public IActionResult Get(string token)
         {
             var authToken = new AuthenticationToken(_config.AuthenticationKeyBytes);
-
+            
             AuthenticatedUser user = _authenticateService.AuthenticateUserByToken(authToken.Decrpt(token));
             if (user == null)
                 return StatusCode((int)HttpStatusCode.Unauthorized);

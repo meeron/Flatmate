@@ -10,12 +10,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using System.Text;
 
 namespace Flatmate.Web.Tests.Controllers
 {
     public class AuthenticateControllerTests
     {
-        private readonly AppConfig _config = new AppConfig { AuthenticationKey = "ANC86rK4e0Zekc11xcwtN1quvwgrrxX+wkxg8QJF768=" };
+        private const string KEY = "some test key";
+
+        private readonly AppConfig _config = new AppConfig 
+        { 
+            AuthenticationKey = Convert.ToBase64String(Encoding.UTF8.GetBytes(KEY)) 
+        };
+
         private readonly IOptions<AppConfig> _options;
 
         public AuthenticateControllerTests()

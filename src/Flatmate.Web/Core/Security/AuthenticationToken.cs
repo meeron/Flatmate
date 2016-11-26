@@ -9,9 +9,7 @@ using System.Text;
 namespace Flatmate.Web.Core.Security
 {
     public class AuthenticationToken
-    {
-        private static byte[] IV = new byte[] { 86, 225, 88, 115, 210, 104, 117, 49, 129, 228, 169, 119, 171, 89, 240, 23 };
-
+    {        
         private readonly byte[] _key;
 
         public AuthenticationToken()
@@ -20,7 +18,11 @@ namespace Flatmate.Web.Core.Security
 
         public AuthenticationToken(byte[] key)
         {
-            _key = key;
+            using(var sha256 = SHA256.Create())
+            {
+                //compute hash to get 32bit key
+                _key = sha256.ComputeHash(key);
+            }
         }
 
         public string Email { get; set; }
@@ -30,20 +32,25 @@ namespace Flatmate.Web.Core.Security
         public string Encrypt()
         {
             string tokenJson = JsonConvert.SerializeObject(this);
-            byte[] tokenBytes = Encoding.UTF8.GetBytes(tokenJson);
+            byte[] tokenObjBytes = Encoding.UTF8.GetBytes(tokenJson);
 
             using (var aes = Aes.Create())
             {
-                aes.IV = IV;
                 aes.Key = _key;
-
-                return Convert.ToBase64String(aes.CreateEncryptor().TransformFinalBlock(tokenBytes, 0, tokenBytes.Length));
+                byte[] encData = aes.CreateEncryptor().TransformFinalBlock(tokenObjBytes, 0, tokenObjBytes.Length);
+                byte[] tokenBytes = aes.IV.Concat(encData).ToArray();
+                string token = Convert.ToBase64String(tokenBytes);
+                
+                //replace '/' so we could use token in URI
+                return token.Replace('/','_');
             }
         }
 
         public AuthenticationToken Decrpt(string token)
         {
             //TODO: add log information why authentication failed
+
+            token = token.Replace('_','/');
 
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentNullException("token");
@@ -52,10 +59,23 @@ namespace Flatmate.Web.Core.Security
             Email = string.Empty;
             Expires = DateTime.MinValue;
             Timestamp = 0;
+            
+            byte[] tokenBytes = null;
+            
+            try 
+            {
+                tokenBytes = Convert.FromBase64String(token);
+            } catch { return this; }
 
             using (var aes = Aes.Create())
             {
-                aes.IV = IV;
+                byte[] iv = new byte[aes.IV.Length];
+                byte[] tokenObjBytes = new byte[tokenBytes.Length - iv.Length];            
+
+                Array.Copy(tokenBytes, iv, iv.Length);
+                Array.Copy(tokenBytes, iv.Length, tokenObjBytes, 0, tokenObjBytes.Length);
+
+                aes.IV = iv;
                 aes.Key = _key;
 
                 using (var decryptor = aes.CreateDecryptor())
@@ -64,17 +84,18 @@ namespace Flatmate.Web.Core.Security
 
                     try
                     {
-                        byte[] tokenBytes = Convert.FromBase64String(token);
-                        tokenJson = Encoding.UTF8.GetString(decryptor.TransformFinalBlock(tokenBytes, 0, tokenBytes.Length));
+                        byte[] decJson = decryptor.TransformFinalBlock(tokenObjBytes, 0, tokenObjBytes.Length);
+                        tokenJson = Encoding.UTF8.GetString(decJson);
+
+                        var authToken = JsonConvert.DeserializeObject<AuthenticationToken>(tokenJson);
+
+                        Email = authToken.Email;
+                        Expires = authToken.Expires;
+                        Timestamp = authToken.Timestamp;
+                        return this;
                     }
                     catch { return this; }
 
-                    var authToken = JsonConvert.DeserializeObject<AuthenticationToken>(tokenJson);
-
-                    Email = authToken.Email;
-                    Expires = authToken.Expires;
-                    Timestamp = authToken.Timestamp;
-                    return this;
                 }
             }
         }
